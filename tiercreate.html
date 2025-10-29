@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TierCreate - Make tier lists easy.</title>
+    <title>TierCreate - Professional Tier List Maker</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -13,139 +19,184 @@
         }
 
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --secondary: #ec4899;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --dark: #1e293b;
-            --dark-light: #334155;
-            --light: #f8fafc;
+            --primary: #5b21b6;
+            --primary-dark: #4c1d95;
+            --primary-light: #7c3aed;
+            --secondary: #c026d3;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --info: #0284c7;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --medium: #475569;
+            --light: #f1f5f9;
             --light-dark: #e2e8f0;
             --text: #0f172a;
             --text-light: #64748b;
             --border: #cbd5e1;
-            --shadow: rgba(0, 0, 0, 0.1);
-            --shadow-lg: rgba(0, 0, 0, 0.2);
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-md: rgba(0, 0, 0, 0.12);
+            --shadow-lg: rgba(0, 0, 0, 0.16);
+            --shadow-xl: rgba(0, 0, 0, 0.24);
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
             min-height: 100vh;
             color: var(--text);
             line-height: 1.6;
             padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(138, 43, 226, 0.3), transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(99, 102, 241, 0.2), transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px var(--shadow-lg);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px var(--shadow-xl);
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 40px;
+            padding: 50px 40px;
             text-align: center;
             color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.03) 10px,
+                rgba(255, 255, 255, 0.03) 20px
+            );
+            animation: headerPattern 20s linear infinite;
+        }
+
+        @keyframes headerPattern {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 20px); }
         }
 
         header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+            font-size: 1.15rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
         }
 
         .main-nav {
             display: flex;
-            gap: 15px;
-            padding: 30px 40px;
+            gap: 0;
+            padding: 0;
             flex-wrap: wrap;
-            border-bottom: 2px solid var(--light);
+            border-bottom: 3px solid var(--light);
+            background: var(--light);
         }
 
         .nav-btn {
             flex: 1;
-            min-width: 200px;
-            padding: 20px 30px;
+            min-width: 180px;
+            padding: 24px 32px;
             border: none;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-bottom: 4px solid transparent;
+            font-size: 1.05rem;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            background: white;
+            color: var(--medium);
+            letter-spacing: 0.3px;
         }
 
         .nav-btn::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
             height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .nav-btn:hover::before {
-            width: 300px;
-            height: 300px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
         }
 
         .nav-btn span {
             position: relative;
             z-index: 1;
-        }
-
-        .nav-btn.primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
-        .nav-btn.secondary {
-            background: linear-gradient(135deg, var(--secondary), #be185d);
-            color: white;
-        }
-
-        .nav-btn.success {
-            background: linear-gradient(135deg, var(--success), #059669);
-            color: white;
-        }
-
-        .nav-btn.warning {
-            background: linear-gradient(135deg, var(--warning), #d97706);
-            color: white;
+            transition: color 0.3s ease;
         }
 
         .nav-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 25px -5px var(--shadow-lg);
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .nav-btn:hover::before {
+            height: 4px;
+        }
+
+        .nav-btn.active {
+            color: var(--primary);
+            background: white;
+            border-bottom-color: var(--primary);
+        }
+
+        .nav-btn.active::before {
+            height: 4px;
         }
 
         .content {
-            padding: 40px;
-            min-height: 500px;
+            padding: 50px;
+            min-height: 600px;
         }
 
         .screen {
             display: none;
-            animation: fadeIn 0.3s ease-in-out;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .screen.active {
@@ -155,7 +206,7 @@
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -164,56 +215,67 @@
         }
 
         .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 30px;
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 35px;
             color: var(--dark);
+            letter-spacing: -0.5px;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 28px;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
+            margin-bottom: 12px;
+            font-weight: 700;
             color: var(--dark);
             font-size: 1.05rem;
+            letter-spacing: 0.2px;
         }
 
-        .form-input, .form-select {
+        .form-input, .form-select, .form-textarea {
             width: 100%;
-            padding: 15px 20px;
+            padding: 16px 22px;
             border: 2px solid var(--border);
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 1rem;
             transition: all 0.3s ease;
             background: white;
+            font-family: inherit;
         }
 
-        .form-input:focus, .form-select:focus {
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 0 4px rgba(91, 33, 182, 0.1);
         }
 
         .btn {
-            padding: 14px 28px;
+            padding: 15px 30px;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            letter-spacing: 0.3px;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
+            box-shadow: 0 4px 6px var(--shadow);
         }
 
         .btn-secondary {
@@ -223,106 +285,138 @@
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #dc2626);
+            background: linear-gradient(135deg, var(--danger), #b91c1c);
             color: white;
+            box-shadow: 0 4px 6px var(--shadow);
         }
 
         .btn-success {
-            background: linear-gradient(135deg, var(--success), #059669);
+            background: linear-gradient(135deg, var(--success), #047857);
             color: white;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info), #0369a1);
+            color: white;
+            box-shadow: 0 4px 6px var(--shadow);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px var(--shadow);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -6px var(--shadow-lg);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
         }
 
         .tier-editor {
             background: var(--light);
-            border-radius: 16px;
-            padding: 30px;
-            margin-top: 20px;
+            border-radius: 18px;
+            padding: 35px;
+            margin-top: 25px;
         }
 
         .tier-item {
             background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 6px -1px var(--shadow);
+            gap: 16px;
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .tier-item:hover {
+            box-shadow: 0 4px 12px var(--shadow-md);
+            transform: translateY(-2px);
         }
 
         .tier-color-picker {
-            width: 60px;
-            height: 60px;
-            border: 3px solid white;
-            border-radius: 12px;
+            width: 70px;
+            height: 70px;
+            border: 4px solid white;
+            border-radius: 14px;
             cursor: pointer;
-            box-shadow: 0 4px 6px -1px var(--shadow);
+            box-shadow: 0 4px 8px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .tier-color-picker:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px var(--shadow-md);
         }
 
         .tier-label-input {
             flex: 1;
-            padding: 12px 16px;
+            padding: 14px 18px;
             border: 2px solid var(--border);
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .tier-label-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(91, 33, 182, 0.1);
+            outline: none;
         }
 
         .tier-controls {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .icon-btn {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             transition: all 0.2s ease;
+            font-weight: 700;
         }
 
         .icon-btn:hover {
-            transform: scale(1.1);
+            transform: scale(1.15);
         }
 
         .items-section {
-            margin-top: 30px;
-            padding: 30px;
+            margin-top: 35px;
+            padding: 35px;
             background: var(--light);
-            border-radius: 16px;
+            border-radius: 18px;
         }
 
         .items-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 18px;
+            margin-top: 25px;
         }
 
         .item-card {
             aspect-ratio: 1;
             background: white;
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
             position: relative;
             cursor: move;
-            box-shadow: 0 4px 6px -1px var(--shadow);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .item-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px -5px var(--shadow-lg);
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 12px 24px var(--shadow-lg);
         }
 
         .item-card img {
@@ -331,166 +425,194 @@
             object-fit: cover;
         }
 
-        .item-card.text {
+        .item-card.text, .item-card.latex {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 14px;
             text-align: center;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             word-break: break-word;
+            overflow: auto;
+        }
+
+        .item-card.latex {
+            font-size: 0.85rem;
         }
 
         .item-card .delete-item {
             position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 25px;
-            height: 25px;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
             background: var(--danger);
             color: white;
             border: none;
             border-radius: 50%;
             cursor: pointer;
             opacity: 0;
-            transition: opacity 0.2s ease;
-            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+            font-weight: 700;
+            box-shadow: 0 2px 4px var(--shadow);
         }
 
         .item-card:hover .delete-item {
             opacity: 1;
         }
 
+        .item-card .delete-item:hover {
+            background: #b91c1c;
+            transform: scale(1.1);
+        }
+
         .upload-zone {
             border: 3px dashed var(--border);
-            border-radius: 16px;
-            padding: 40px;
+            border-radius: 18px;
+            padding: 50px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 20px;
+            margin-top: 25px;
+            background: white;
         }
 
         .upload-zone:hover {
             border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.05);
+            background: rgba(91, 33, 182, 0.03);
         }
 
         .upload-zone.dragover {
             border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(91, 33, 182, 0.08);
+            transform: scale(1.02);
         }
 
         .template-card, .evaluation-card {
             background: white;
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px var(--shadow);
-            transition: all 0.3s ease;
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
         }
 
         .template-card:hover, .evaluation-card:hover {
-            box-shadow: 0 20px 25px -5px var(--shadow-lg);
-            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -10px var(--shadow-lg);
+            transform: translateY(-4px);
+            border-color: var(--primary-light);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .card-title {
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-size: 1.6rem;
+            font-weight: 800;
             color: var(--dark);
+            letter-spacing: -0.3px;
         }
 
         .card-actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .tier-list-container {
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         .tier-row {
             display: flex;
-            min-height: 100px;
-            margin-bottom: 2px;
+            min-height: 110px;
+            margin-bottom: 3px;
             background: white;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 2px 4px var(--shadow);
+            box-shadow: 0 2px 6px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .tier-row:hover {
+            box-shadow: 0 4px 12px var(--shadow-md);
         }
 
         .tier-label-display {
-            min-width: 100px;
+            min-width: 110px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 900;
             color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+            letter-spacing: -1px;
         }
 
         .tier-drop-zone {
             flex: 1;
-            padding: 15px;
+            padding: 18px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
             align-items: center;
-            background: rgba(0, 0, 0, 0.03);
+            background: rgba(0, 0, 0, 0.02);
             transition: all 0.3s ease;
         }
 
         .tier-drop-zone.drag-over {
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(91, 33, 182, 0.12);
             border: 3px dashed var(--primary);
         }
 
         .unranked-zone {
             background: var(--light);
-            border-radius: 16px;
-            padding: 25px;
-            margin-top: 30px;
+            border-radius: 18px;
+            padding: 30px;
+            margin-top: 35px;
         }
 
         .unranked-items {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
-            min-height: 100px;
-            padding: 15px;
+            min-height: 110px;
+            padding: 18px;
             background: white;
-            border-radius: 12px;
-            margin-top: 15px;
+            border-radius: 14px;
+            margin-top: 18px;
+            box-shadow: 0 2px 6px var(--shadow);
         }
 
         .dragging {
-            opacity: 0.5;
+            opacity: 0.4;
+            transform: scale(0.9);
         }
 
         .evaluation-item {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             background: white;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
             cursor: move;
-            box-shadow: 0 2px 4px var(--shadow);
+            box-shadow: 0 2px 6px var(--shadow);
             transition: all 0.2s ease;
         }
 
         .evaluation-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px var(--shadow-lg);
+            transform: scale(1.08);
+            box-shadow: 0 6px 16px var(--shadow-lg);
         }
 
         .evaluation-item img {
@@ -499,15 +621,20 @@
             object-fit: cover;
         }
 
-        .evaluation-item.text {
+        .evaluation-item.text, .evaluation-item.latex {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             word-break: break-word;
+            overflow: auto;
+        }
+
+        .evaluation-item.latex {
+            font-size: 0.7rem;
         }
 
         .modal {
@@ -517,11 +644,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
         .modal.active {
@@ -531,151 +659,217 @@
         .modal-content {
             background: white;
             border-radius: 24px;
-            padding: 40px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
+            padding: 45px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 25px 50px -12px var(--shadow-lg);
-            animation: modalSlideIn 0.3s ease;
+            box-shadow: 0 25px 50px -12px var(--shadow-xl);
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @keyframes modalSlideIn {
             from {
                 opacity: 0;
-                transform: translateY(-50px);
+                transform: translateY(-60px) scale(0.95);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
         .modal-header {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 25px;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 30px;
             color: var(--dark);
+            letter-spacing: -0.5px;
         }
 
         .modal-option {
-            padding: 20px;
+            padding: 24px;
             background: var(--light);
-            border-radius: 12px;
-            margin-bottom: 15px;
+            border-radius: 14px;
+            margin-bottom: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 2px solid transparent;
         }
 
         .modal-option:hover {
-            background: var(--primary-light);
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
             color: white;
-            border-color: var(--primary);
-            transform: translateX(5px);
+            border-color: var(--primary-dark);
+            transform: translateX(8px);
+            box-shadow: 0 8px 16px var(--shadow-md);
         }
 
         .modal-option h4 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            font-weight: 700;
         }
 
         .modal-option p {
-            font-size: 0.9rem;
-            opacity: 0.8;
+            font-size: 0.95rem;
+            opacity: 0.85;
         }
 
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             color: var(--text-light);
         }
 
         .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.5;
+            font-size: 5rem;
+            margin-bottom: 24px;
+            opacity: 0.4;
         }
 
         .empty-state-text {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--medium);
         }
 
         .action-bar {
             display: flex;
-            gap: 15px;
+            gap: 16px;
             flex-wrap: wrap;
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 2px solid var(--light);
+            margin-top: 35px;
+            padding-top: 35px;
+            border-top: 3px solid var(--light);
         }
 
         .badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.9rem;
+            font-weight: 700;
             background: var(--light);
-            color: var(--text);
+            color: var(--dark);
+            letter-spacing: 0.2px;
         }
 
         .custom-tiers-input {
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         .custom-tier-input {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .latex-preview {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--border);
+        }
+
+        .latex-hint {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--dark);
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 1.05rem;
+            line-height: 1.7;
         }
 
         @media (max-width: 768px) {
             header h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
             }
 
             .nav-btn {
-                min-width: 150px;
-                padding: 15px 20px;
+                min-width: 140px;
+                padding: 18px 20px;
+                font-size: 0.95rem;
             }
 
             .content {
-                padding: 20px;
+                padding: 30px 20px;
             }
 
             .section-title {
-                font-size: 1.5rem;
+                font-size: 1.8rem;
             }
 
             .items-grid {
-                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-                gap: 10px;
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 12px;
             }
 
             .tier-label-display {
-                min-width: 70px;
-                font-size: 1.5rem;
+                min-width: 80px;
+                font-size: 2rem;
             }
 
             .evaluation-item {
-                width: 60px;
-                height: 60px;
+                width: 70px;
+                height: 70px;
+            }
+
+            .modal-content {
+                padding: 30px;
             }
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 50px;
         }
 
         .spinner {
-            border: 4px solid var(--light);
-            border-top: 4px solid var(--primary);
+            border: 5px solid var(--light);
+            border-top: 5px solid var(--primary);
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
             margin: 0 auto;
         }
@@ -684,29 +878,86 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* KaTeX custom styling */
+        .katex {
+            font-size: 1em;
+        }
+
+        .item-card .katex,
+        .evaluation-item .katex {
+            font-size: 0.9em;
+        }
+
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .text-type-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .type-option {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .type-option:hover {
+            border-color: var(--primary);
+            background: rgba(91, 33, 182, 0.05);
+        }
+
+        .type-option.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🏆TierCreate</h1>
-            <p>Create, evaluate, and share professional tier lists</p>
+            <h1>TierCreate</h1>
+            <p>Professional tier list creation with LaTeX support</p>
         </header>
 
         <nav class="main-nav">
-            <button class="nav-btn primary" onclick="showScreen('home')">
+            <button class="nav-btn active" onclick="showScreen('home')" data-screen="home">
                 <span>Home</span>
             </button>
-            <button class="nav-btn secondary" onclick="showScreen('create-template')">
+            <button class="nav-btn" onclick="showScreen('create-template')" data-screen="create-template">
                 <span>Create Template</span>
             </button>
-            <button class="nav-btn success" onclick="showScreen('my-templates')">
+            <button class="nav-btn" onclick="showScreen('my-templates')" data-screen="my-templates">
                 <span>My Templates</span>
             </button>
-            <button class="nav-btn warning" onclick="initEvaluate()">
+            <button class="nav-btn" onclick="initEvaluate()" data-screen="evaluate">
                 <span>Evaluate</span>
             </button>
-            <button class="nav-btn primary" onclick="showScreen('my-evaluations')">
+            <button class="nav-btn" onclick="showScreen('my-evaluations')" data-screen="my-evaluations">
                 <span>My Evaluations</span>
             </button>
         </nav>
@@ -714,25 +965,31 @@
         <div class="content">
             <!-- Home Screen -->
             <div id="home-screen" class="screen active">
-                <h2 class="section-title">Welcome to TierCreate!</h2>
-                <p style="font-size: 1.1rem; color: var(--text-light); margin-bottom: 30px;">
-                    Create professional tier lists for anything - from ranking your favorite movies to organizing your priorities.
+                <h2 class="section-title">Welcome to TierCreate</h2>
+                <p style="font-size: 1.2rem; color: var(--text-light); margin-bottom: 40px; line-height: 1.8;">
+                    The most powerful tier list maker with native LaTeX support for mathematical expressions. 
+                    Perfect for academics, researchers, and anyone who needs professional ranking tools.
                 </p>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                    <div style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 30px; border-radius: 16px; color: white;">
-                        <div style="font-size: 2.5rem; margin-bottom: 10px;">➕</div>
-                        <h3 style="margin-bottom: 10px;">Create Templates</h3>
-                        <p style="opacity: 0.9;">Design custom tier list templates with your own tiers and items.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+                    <div class="feature-card">
+                        <div class="feature-icon">📐</div>
+                        <h3>LaTeX Integration</h3>
+                        <p>Write mathematical formulas using $...$ for inline or $$...$$ for display math. Perfect for ranking equations, theorems, or mathematical concepts.</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, var(--success), #059669); padding: 30px; border-radius: 16px; color: white;">
-                        <div style="font-size: 2.5rem; margin-bottom: 10px;">⭐</div>
-                        <h3 style="margin-bottom: 10px;">Evaluate & Rank</h3>
-                        <p style="opacity: 0.9;">Use drag-and-drop to rank items in your tier lists.</p>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3>Custom Templates</h3>
+                        <p>Create templates with Standard (S-F), Extended (T-F), or fully custom tier systems. Adjust colors, labels, and ordering to match your needs.</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, var(--secondary), #be185d); padding: 30px; border-radius: 16px; color: white;">
-                        <div style="font-size: 2.5rem; margin-bottom: 10px;">💾</div>
-                        <h3 style="margin-bottom: 10px;">Save & Share</h3>
-                        <p style="opacity: 0.9;">Export your tier lists as images or save them for later.</p>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Drag & Drop</h3>
+                        <p>Intuitive drag-and-drop interface for ranking items. Move entries between tiers effortlessly with smooth animations and visual feedback.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💾</div>
+                        <h3>Save & Export</h3>
+                        <p>Save evaluations to local storage for editing later, or export as high-quality images to share your rankings with others.</p>
                     </div>
                 </div>
             </div>
@@ -743,7 +1000,7 @@
                 
                 <div class="form-group">
                     <label class="form-label">Template Name</label>
-                    <input type="text" id="template-name" class="form-input" placeholder="e.g., My Favorite Movies">
+                    <input type="text" id="template-name" class="form-input" placeholder="e.g., Calculus Theorems, Greatest Algorithms">
                 </div>
 
                 <div class="form-group">
@@ -766,32 +1023,32 @@
 
                 <div id="tier-editor" style="display: none;">
                     <div class="tier-editor">
-                        <h3 style="margin-bottom: 20px; font-size: 1.3rem;">Customize Tiers</h3>
+                        <h3 style="margin-bottom: 24px; font-size: 1.5rem; font-weight: 800;">Customize Tiers</h3>
                         <div id="tiers-list"></div>
-                        <button class="btn btn-primary" onclick="addTier()" style="margin-top: 15px;">
-                            ➕ Add Tier
+                        <button class="btn btn-primary" onclick="addTier()" style="margin-top: 18px;">
+                            Add Tier
                         </button>
                     </div>
                 </div>
 
                 <div id="items-section" style="display: none;" class="items-section">
-                    <h3 style="margin-bottom: 20px; font-size: 1.3rem;">Add Items to Rank</h3>
+                    <h3 style="margin-bottom: 24px; font-size: 1.5rem; font-weight: 800;">Add Items to Rank</h3>
                     
-                    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
                         <button class="btn btn-primary" onclick="document.getElementById('image-upload').click()">
-                            🖼️ Upload Images
+                            Upload Images
                         </button>
-                        <button class="btn btn-secondary" onclick="showAddTextModal()">
-                            ✍️ Add Text Item
+                        <button class="btn btn-info" onclick="showAddTextModal()">
+                            Add Text/LaTeX Item
                         </button>
                     </div>
 
                     <input type="file" id="image-upload" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)">
 
                     <div class="upload-zone" id="drop-zone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                        <div style="font-size: 3rem; margin-bottom: 10px;">📁</div>
-                        <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 5px;">Drag & Drop Images Here</div>
-                        <div style="color: var(--text-light);">or click the upload button above</div>
+                        <div style="font-size: 3.5rem; margin-bottom: 14px; opacity: 0.6;">📁</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">Drag & Drop Images Here</div>
+                        <div style="color: var(--text-light); font-size: 1.05rem;">or click the upload button above</div>
                     </div>
 
                     <div id="items-grid" class="items-grid"></div>
@@ -799,10 +1056,10 @@
 
                 <div class="action-bar">
                     <button class="btn btn-success" onclick="saveTemplate()">
-                        💾 Save Template
+                        Save Template
                     </button>
                     <button class="btn btn-secondary" onclick="showScreen('home')">
-                        ❌ Cancel
+                        Cancel
                     </button>
                 </div>
             </div>
@@ -819,23 +1076,23 @@
                 <div id="evaluation-name-section">
                     <div class="form-group">
                         <label class="form-label">Evaluation Name</label>
-                        <input type="text" id="evaluation-name" class="form-input" placeholder="e.g., My Movie Rankings 2025">
+                        <input type="text" id="evaluation-name" class="form-input" placeholder="e.g., My Top Theorems 2025">
                     </div>
                 </div>
                 <div id="tier-list-container" class="tier-list-container"></div>
                 <div class="unranked-zone">
-                    <h3 style="font-size: 1.3rem; margin-bottom: 15px;">Unranked Items</h3>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 18px; font-weight: 800;">Unranked Items</h3>
                     <div id="unranked-items" class="unranked-items"></div>
                 </div>
                 <div class="action-bar">
                     <button class="btn btn-success" onclick="saveEvaluation()">
-                        💾 Save Evaluation
+                        Save Evaluation
                     </button>
                     <button class="btn btn-primary" onclick="downloadEvaluationImage()">
-                        📥 Download as Image
+                        Download as Image
                     </button>
                     <button class="btn btn-secondary" onclick="showScreen('home')">
-                        ❌ Cancel
+                        Cancel
                     </button>
                 </div>
             </div>
@@ -864,7 +1121,7 @@
                 <h4>Custom</h4>
                 <p>Create your own custom tier labels</p>
             </div>
-            <button class="btn btn-secondary" onclick="closeModal('tier-system-modal')" style="margin-top: 20px; width: 100%;">
+            <button class="btn btn-secondary" onclick="closeModal('tier-system-modal')" style="margin-top: 24px; width: 100%;">
                 Cancel
             </button>
         </div>
@@ -872,15 +1129,36 @@
 
     <div id="text-item-modal" class="modal">
         <div class="modal-content">
-            <h2 class="modal-header">Add Text Item</h2>
+            <h2 class="modal-header">Add Text/LaTeX Item</h2>
+            
+            <div class="text-type-selector">
+                <div class="type-option active" data-type="text" onclick="selectTextType('text')">
+                    <div style="font-size: 1.1rem; margin-bottom: 4px;">Plain Text</div>
+                    <div style="font-size: 0.85rem; opacity: 0.7;">Regular text entry</div>
+                </div>
+                <div class="type-option" data-type="latex" onclick="selectTextType('latex')">
+                    <div style="font-size: 1.1rem; margin-bottom: 4px;">LaTeX Math</div>
+                    <div style="font-size: 0.85rem; opacity: 0.7;">Mathematical formula</div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label class="form-label">Item Text</label>
-                <input type="text" id="text-item-input" class="form-input" placeholder="e.g., The Shawshank Redemption">
+                <textarea id="text-item-input" class="form-textarea" placeholder="e.g., The Fundamental Theorem of Calculus" oninput="updateLatexPreview()"></textarea>
+                <div class="latex-hint" id="latex-hint" style="display: none;">
+                    Use $...$ for inline math or $$...$$ for display math. Example: $\int_a^b f(x)dx$ or $$E = mc^2$$
+                </div>
             </div>
-            <button class="btn btn-primary" onclick="addTextItem()" style="width: 100%;">
-                ➕ Add Item
+
+            <div id="latex-preview-container" style="display: none;">
+                <label class="form-label">Preview</label>
+                <div class="latex-preview" id="latex-preview"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="addTextItem()" style="width: 100%; margin-top: 10px;">
+                Add Item
             </button>
-            <button class="btn btn-secondary" onclick="closeModal('text-item-modal')" style="margin-top: 10px; width: 100%;">
+            <button class="btn btn-secondary" onclick="closeModal('text-item-modal')" style="margin-top: 12px; width: 100%;">
                 Cancel
             </button>
         </div>
@@ -890,7 +1168,7 @@
         <div class="modal-content">
             <h2 class="modal-header">Select Template to Evaluate</h2>
             <div id="template-select-list"></div>
-            <button class="btn btn-secondary" onclick="closeModal('template-select-modal')" style="margin-top: 20px; width: 100%;">
+            <button class="btn btn-secondary" onclick="closeModal('template-select-modal')" style="margin-top: 24px; width: 100%;">
                 Cancel
             </button>
         </div>
@@ -898,10 +1176,11 @@
 
     <script>
         // Data Management
-        const DATA_KEY = 'tierListMakerData';
+        const DATA_KEY = 'tierCreateData';
         let currentTemplate = null;
         let currentEvaluation = null;
         let draggedElement = null;
+        let currentTextType = 'text';
 
         function loadData() {
             const data = localStorage.getItem(DATA_KEY);
@@ -916,10 +1195,66 @@
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
         }
 
+        // LaTeX Rendering
+        function renderLatex(element) {
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(element, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function hasLatex(text) {
+            return /\$\$[\s\S]+?\$\$|\$[^$]+?\$/.test(text);
+        }
+
+        function selectTextType(type) {
+            currentTextType = type;
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('active');
+            
+            const hint = document.getElementById('latex-hint');
+            const previewContainer = document.getElementById('latex-preview-container');
+            
+            if (type === 'latex') {
+                hint.style.display = 'block';
+                previewContainer.style.display = 'block';
+                updateLatexPreview();
+            } else {
+                hint.style.display = 'none';
+                previewContainer.style.display = 'none';
+            }
+        }
+
+        function updateLatexPreview() {
+            if (currentTextType !== 'latex') return;
+            
+            const input = document.getElementById('text-item-input').value;
+            const preview = document.getElementById('latex-preview');
+            
+            if (input.trim()) {
+                preview.innerHTML = input;
+                renderLatex(preview);
+            } else {
+                preview.innerHTML = '<span style="color: var(--text-light);">Preview will appear here...</span>';
+            }
+        }
+
         // Screen Management
         function showScreen(screenName) {
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
             document.getElementById(`${screenName}-screen`).classList.add('active');
+
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`[data-screen="${screenName}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
 
             if (screenName === 'my-templates') {
                 renderTemplates();
@@ -979,7 +1314,7 @@
             }
 
             const btnContainer = document.createElement('div');
-            btnContainer.style.marginTop = '20px';
+            btnContainer.style.marginTop = '24px';
             btnContainer.innerHTML = '<button class="btn btn-primary" onclick="applyCustomTiers()">Apply Custom Tiers</button>';
             container.appendChild(btnContainer);
         }
@@ -1054,7 +1389,7 @@
                     <div class="tier-controls">
                         ${index > 0 ? `<button class="icon-btn" style="background: var(--light);" onclick="moveTier('${tier.id}', -1)">↑</button>` : ''}
                         ${index < currentTemplate.tiers.length - 1 ? `<button class="icon-btn" style="background: var(--light);" onclick="moveTier('${tier.id}', 1)">↓</button>` : ''}
-                        <button class="icon-btn" style="background: var(--danger); color: white;" onclick="deleteTier('${tier.id}')">🗑️</button>
+                        <button class="icon-btn" style="background: var(--danger); color: white;" onclick="deleteTier('${tier.id}')">×</button>
                     </div>
                 `;
                 container.appendChild(div);
@@ -1156,6 +1491,13 @@
 
         function showAddTextModal() {
             document.getElementById('text-item-input').value = '';
+            currentTextType = 'text';
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            document.querySelector('[data-type="text"]').classList.add('active');
+            document.getElementById('latex-hint').style.display = 'none';
+            document.getElementById('latex-preview-container').style.display = 'none';
             openModal('text-item-modal');
         }
 
@@ -1166,9 +1508,10 @@
                 return;
             }
 
+            const isLatex = hasLatex(text);
             const item = {
                 id: generateId(),
-                type: 'text',
+                type: isLatex ? 'latex' : 'text',
                 content: text
             };
             currentTemplate.items.push(item);
@@ -1190,6 +1533,12 @@
                         <img src="${item.content}" alt="Item">
                         <button class="delete-item" onclick="deleteItem('${item.id}')">×</button>
                     `;
+                } else if (item.type === 'latex') {
+                    div.innerHTML = `
+                        <div class="latex-content">${item.content}</div>
+                        <button class="delete-item" onclick="deleteItem('${item.id}')">×</button>
+                    `;
+                    setTimeout(() => renderLatex(div), 0);
                 } else {
                     div.innerHTML = `
                         ${item.content}
@@ -1260,7 +1609,7 @@
                     <div class="empty-state">
                         <div class="empty-state-icon">📋</div>
                         <div class="empty-state-text">No templates yet</div>
-                        <button class="btn btn-primary" onclick="showScreen('create-template')" style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="showScreen('create-template')" style="margin-top: 24px;">
                             Create Your First Template
                         </button>
                     </div>
@@ -1272,27 +1621,31 @@
             data.templates.forEach(template => {
                 const div = document.createElement('div');
                 div.className = 'template-card';
+                
+                const hasLatexItems = template.items.some(item => item.type === 'latex');
+                
                 div.innerHTML = `
                     <div class="card-header">
                         <div>
                             <div class="card-title">${template.name}</div>
-                            <div style="margin-top: 8px;">
+                            <div style="margin-top: 10px;">
                                 <span class="badge">${template.tiers.length} tiers</span>
                                 <span class="badge">${template.items.length} items</span>
+                                ${hasLatexItems ? '<span class="badge" style="background: var(--primary); color: white;">LaTeX</span>' : ''}
                             </div>
                         </div>
                         <div class="card-actions">
                             <button class="btn btn-primary" onclick="startEvaluationWithTemplate('${template.id}')">
-                                ⭐ Evaluate
+                                Evaluate
                             </button>
                             <button class="btn btn-danger" onclick="deleteTemplate('${template.id}')">
-                                🗑️ Delete
+                                Delete
                             </button>
                         </div>
                     </div>
-                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div style="margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap;">
                         ${template.tiers.map(tier => `
-                            <div style="padding: 8px 16px; border-radius: 8px; background: ${tier.color}; color: white; font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                            <div style="padding: 10px 20px; border-radius: 10px; background: ${tier.color}; color: white; font-weight: 800; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); font-size: 1.1rem;">
                                 ${tier.label}
                             </div>
                         `).join('')}
@@ -1331,9 +1684,12 @@
                     closeModal('template-select-modal');
                     startEvaluationWithTemplate(template.id);
                 };
+                
+                const hasLatexItems = template.items.some(item => item.type === 'latex');
+                
                 div.innerHTML = `
                     <h4>${template.name}</h4>
-                    <p>${template.tiers.length} tiers • ${template.items.length} items</p>
+                    <p>${template.tiers.length} tiers • ${template.items.length} items${hasLatexItems ? ' • Contains LaTeX' : ''}</p>
                 `;
                 container.appendChild(div);
             });
@@ -1435,6 +1791,9 @@
 
             if (item.type === 'image') {
                 div.innerHTML = `<img src="${item.content}" alt="Item">`;
+            } else if (item.type === 'latex') {
+                div.innerHTML = `<div class="latex-content">${item.content}</div>`;
+                setTimeout(() => renderLatex(div), 0);
             } else {
                 div.textContent = item.content;
             }
@@ -1534,7 +1893,7 @@
                     <div class="empty-state">
                         <div class="empty-state-icon">📊</div>
                         <div class="empty-state-text">No evaluations yet</div>
-                        <button class="btn btn-primary" onclick="initEvaluate()" style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="initEvaluate()" style="margin-top: 24px;">
                             Create Your First Evaluation
                         </button>
                     </div>
@@ -1553,27 +1912,31 @@
                     <div class="card-header">
                         <div>
                             <div class="card-title">${evaluation.name}</div>
-                            <div style="margin-top: 8px; color: var(--text-light);">
+                            <div style="margin-top: 10px; color: var(--text-light);">
                                 Template: ${evaluation.template.name} • ${date}
                             </div>
                         </div>
                         <div class="card-actions">
                             <button class="btn btn-primary" onclick="editEvaluation('${evaluation.id}')">
-                                ✏️ Edit
+                                Edit
                             </button>
                             <button class="btn btn-success" onclick="downloadEvaluationById('${evaluation.id}')">
-                                📥 Download
+                                Download
                             </button>
                             <button class="btn btn-danger" onclick="deleteEvaluation('${evaluation.id}')">
-                                🗑️ Delete
+                                Delete
                             </button>
                         </div>
                     </div>
-                    <div style="margin-top: 20px;">
+                    <div style="margin-top: 24px;" id="eval-preview-${evaluation.id}">
                         ${renderEvaluationPreview(evaluation)}
                     </div>
                 `;
                 container.appendChild(div);
+                
+                // Render LaTeX in preview
+                const previewElement = document.getElementById(`eval-preview-${evaluation.id}`);
+                setTimeout(() => renderLatex(previewElement), 0);
             });
         }
 
@@ -1582,20 +1945,24 @@
             evaluation.template.tiers.forEach(tier => {
                 const itemIds = evaluation.placements[tier.id] || [];
                 html += `
-                    <div style="display: flex; min-height: 60px; margin-bottom: 2px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px var(--shadow);">
-                        <div style="min-width: 60px; background: ${tier.color}; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; font-size: 1.5rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                    <div style="display: flex; min-height: 70px; margin-bottom: 3px; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px var(--shadow);">
+                        <div style="min-width: 70px; background: ${tier.color}; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
                             ${tier.label}
                         </div>
-                        <div style="flex: 1; padding: 10px; display: flex; gap: 8px; flex-wrap: wrap; background: rgba(0,0,0,0.02);">
+                        <div style="flex: 1; padding: 12px; display: flex; gap: 10px; flex-wrap: wrap; background: rgba(0,0,0,0.02);">
                             ${itemIds.map(itemId => {
                                 const item = evaluation.template.items.find(i => i.id === itemId);
                                 if (!item) return '';
                                 if (item.type === 'image') {
-                                    return `<div style="width: 50px; height: 50px; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px var(--shadow);">
+                                    return `<div style="width: 55px; height: 55px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px var(--shadow);">
                                         <img src="${item.content}" style="width: 100%; height: 100%; object-fit: cover;">
                                     </div>`;
+                                } else if (item.type === 'latex') {
+                                    return `<div style="padding: 10px 14px; background: white; border-radius: 8px; font-size: 0.75rem; box-shadow: 0 2px 6px var(--shadow); display: flex; align-items: center;">
+                                        ${item.content}
+                                    </div>`;
                                 } else {
-                                    return `<div style="padding: 8px 12px; background: white; border-radius: 6px; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 4px var(--shadow);">
+                                    return `<div style="padding: 10px 14px; background: white; border-radius: 8px; font-size: 0.85rem; font-weight: 600; box-shadow: 0 2px 6px var(--shadow); display: flex; align-items: center;">
                                         ${item.content}
                                     </div>`;
                                 }
@@ -1666,29 +2033,34 @@
             tempContainer.style.position = 'absolute';
             tempContainer.style.left = '-9999px';
             tempContainer.style.background = 'white';
-            tempContainer.style.padding = '40px';
+            tempContainer.style.padding = '50px';
+            tempContainer.style.width = '1200px';
             document.body.appendChild(tempContainer);
 
             // Render evaluation
             evaluation.template.tiers.forEach(tier => {
                 const itemIds = evaluation.placements[tier.id] || [];
                 const row = document.createElement('div');
-                row.style.cssText = 'display: flex; min-height: 100px; margin-bottom: 2px; border-radius: 8px; overflow: hidden;';
+                row.style.cssText = 'display: flex; min-height: 110px; margin-bottom: 3px; border-radius: 10px; overflow: hidden;';
                 
                 row.innerHTML = `
-                    <div style="min-width: 100px; background: ${tier.color}; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; font-size: 2rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                    <div style="min-width: 110px; background: ${tier.color}; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; font-size: 2.5rem; text-shadow: 2px 2px 6px rgba(0,0,0,0.3);">
                         ${tier.label}
                     </div>
-                    <div style="flex: 1; padding: 15px; display: flex; gap: 10px; flex-wrap: wrap; background: rgba(0,0,0,0.03);">
+                    <div style="flex: 1; padding: 18px; display: flex; gap: 12px; flex-wrap: wrap; background: rgba(0,0,0,0.02);">
                         ${itemIds.map(itemId => {
                             const item = evaluation.template.items.find(i => i.id === itemId);
                             if (!item) return '';
                             if (item.type === 'image') {
-                                return `<div style="width: 80px; height: 80px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                return `<div style="width: 90px; height: 90px; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
                                     <img src="${item.content}" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>`;
+                            } else if (item.type === 'latex') {
+                                return `<div style="padding: 12px 18px; background: white; border-radius: 10px; font-size: 0.9rem; display: flex; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                                    ${item.content}
+                                </div>`;
                             } else {
-                                return `<div style="padding: 10px 15px; background: white; border-radius: 8px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                return `<div style="padding: 12px 18px; background: white; border-radius: 10px; font-size: 1rem; font-weight: 600; display: flex; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
                                     ${item.content}
                                 </div>`;
                             }
@@ -1698,17 +2070,22 @@
                 tempContainer.appendChild(row);
             });
 
-            // Generate image
-            html2canvas(tempContainer, {
-                backgroundColor: '#ffffff',
-                scale: 2
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `${evaluation.name.replace(/\s+/g, '-').toLowerCase()}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-                document.body.removeChild(tempContainer);
-            });
+            // Render LaTeX before capturing
+            renderLatex(tempContainer);
+            
+            // Wait a bit for LaTeX to render, then generate image
+            setTimeout(() => {
+                html2canvas(tempContainer, {
+                    backgroundColor: '#ffffff',
+                    scale: 2
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `${evaluation.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    document.body.removeChild(tempContainer);
+                });
+            }, 500);
         }
 
         function deleteEvaluation(evaluationId) {
