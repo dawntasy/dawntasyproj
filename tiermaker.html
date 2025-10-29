@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Tier List Maker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --dark-light: #334155;
+            --light: #f8fafc;
+            --light-dark: #e2e8f0;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --border: #cbd5e1;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-lg: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 15px;
+            padding: 30px 40px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .nav-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 20px 30px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .nav-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .nav-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .nav-btn.secondary {
+            background: linear-gradient(135deg, var(--secondary), #be185d);
+            color: white;
+        }
+
+        .nav-btn.success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .nav-btn.warning {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            color: white;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px var(--shadow-lg);
+        }
+
+        .content {
+            padding: 40px;
+            min-height: 500px;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.05rem;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px var(--shadow);
+        }
+
+        .tier-editor {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .tier-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 6px -1px var(--shadow);
+        }
+
+        .tier-color-picker {
+            width: 60px;
+            height: 60px;
+            border: 3px solid white;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px var(--shadow);
+        }
+
+        .tier-label-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .tier-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .items-section {
+            margin-top: 30px;
+            padding: 30px;
+            background: var(--light);
+            border-radius: 16px;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .item-card {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            cursor: move;
+            box-shadow: 0 4px 6px -1px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px var(--shadow-lg);
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-card.text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+
+        .item-card .delete-item {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 25px;
+            height: 25px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            font-size: 0.8rem;
+        }
+
+        .item-card:hover .delete-item {
+            opacity: 1;
+        }
+
+        .upload-zone {
+            border: 3px dashed var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .template-card, .evaluation-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .template-card:hover, .evaluation-card:hover {
+            box-shadow: 0 20px 25px -5px var(--shadow-lg);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tier-list-container {
+            margin-top: 20px;
+        }
+
+        .tier-row {
+            display: flex;
+            min-height: 100px;
+            margin-bottom: 2px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .tier-label-display {
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .tier-drop-zone {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .tier-drop-zone.drag-over {
+            background: rgba(99, 102, 241, 0.1);
+            border: 3px dashed var(--primary);
+        }
+
+        .unranked-zone {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .unranked-items {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            min-height: 100px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .dragging {
+            opacity: 0.5;
+        }
+
+        .evaluation-item {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: move;
+            box-shadow: 0 2px 4px var(--shadow);
+            transition: all 0.2s ease;
+        }
+
+        .evaluation-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px var(--shadow-lg);
+        }
+
+        .evaluation-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .evaluation-item.text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            word-break: break-word;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px var(--shadow-lg);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+
+        .modal-option {
+            padding: 20px;
+            background: var(--light);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .modal-option:hover {
+            background: var(--primary-light);
+            color: white;
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .modal-option h4 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .modal-option p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid var(--light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: var(--light);
+            color: var(--text);
+        }
+
+        .custom-tiers-input {
+            margin-top: 15px;
+        }
+
+        .custom-tier-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .nav-btn {
+                min-width: 150px;
+                padding: 15px 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .items-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 10px;
+            }
+
+            .tier-label-display {
+                min-width: 70px;
+                font-size: 1.5rem;
+            }
+
+            .evaluation-item {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid var(--light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏆 Universal Tier List Maker</h1>
+            <p>Create, evaluate, and share professional tier lists</p>
+        </header>
+
+        <nav class="main-nav">
+            <button class="nav-btn primary" onclick="showScreen('home')">
+                <span>🏠 Home</span>
+            </button>
+            <button class="nav-btn secondary" onclick="showScreen('create-template')">
+                <span>➕ Create Template</span>
+            </button>
+            <button class="nav-btn success" onclick="showScreen('my-templates')">
+                <span>📋 My Templates</span>
+            </button>
+            <button class="nav-btn warning" onclick="initEvaluate()">
+                <span>⭐ Evaluate</span>
+            </button>
+            <button class="nav-btn primary" onclick="showScreen('my-evaluations')">
+                <span>📊 My Evaluations</span>
+            </button>
+        </nav>
+
+        <div class="content">
+            <!-- Home Screen -->
+            <div id="home-screen" class="screen active">
+                <h2 class="section-title">Welcome to Universal Tier List Maker</h2>
+                <p style="font-size: 1.1rem; color: var(--text-light); margin-bottom: 30px;">
+                    Create professional tier lists for anything - from ranking your favorite movies to organizing your priorities.
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 30px; border-radius: 16px; color: white;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">➕</div>
+                        <h3 style="margin-bottom: 10px;">Create Templates</h3>
+                        <p style="opacity: 0.9;">Design custom tier list templates with your own tiers and items.</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, var(--success), #059669); padding: 30px; border-radius: 16px; color: white;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">⭐</div>
+                        <h3 style="margin-bottom: 10px;">Evaluate & Rank</h3>
+                        <p style="opacity: 0.9;">Use drag-and-drop to rank items in your tier lists.</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, var(--secondary), #be185d); padding: 30px; border-radius: 16px; color: white;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">💾</div>
+                        <h3 style="margin-bottom: 10px;">Save & Share</h3>
+                        <p style="opacity: 0.9;">Export your tier lists as images or save them for later.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Template Screen -->
+            <div id="create-template-screen" class="screen">
+                <h2 class="section-title">Create New Template</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Template Name</label>
+                    <input type="text" id="template-name" class="form-input" placeholder="e.g., My Favorite Movies">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tier System</label>
+                    <select id="tier-system" class="form-select" onchange="handleTierSystemChange()">
+                        <option value="">Select a tier system</option>
+                        <option value="standard">Standard (S, A, B, C, D, F)</option>
+                        <option value="extended">Extended (T, S, A, B, C, D, F)</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+
+                <div id="custom-tiers-container" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Number of Tiers</label>
+                        <input type="number" id="custom-tier-count" class="form-input" min="1" max="15" value="5" onchange="generateCustomTierInputs()">
+                    </div>
+                    <div id="custom-tiers-input" class="custom-tiers-input"></div>
+                </div>
+
+                <div id="tier-editor" style="display: none;">
+                    <div class="tier-editor">
+                        <h3 style="margin-bottom: 20px; font-size: 1.3rem;">Customize Tiers</h3>
+                        <div id="tiers-list"></div>
+                        <button class="btn btn-primary" onclick="addTier()" style="margin-top: 15px;">
+                            ➕ Add Tier
+                        </button>
+                    </div>
+                </div>
+
+                <div id="items-section" style="display: none;" class="items-section">
+                    <h3 style="margin-bottom: 20px; font-size: 1.3rem;">Add Items to Rank</h3>
+                    
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                        <button class="btn btn-primary" onclick="document.getElementById('image-upload').click()">
+                            🖼️ Upload Images
+                        </button>
+                        <button class="btn btn-secondary" onclick="showAddTextModal()">
+                            ✍️ Add Text Item
+                        </button>
+                    </div>
+
+                    <input type="file" id="image-upload" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)">
+
+                    <div class="upload-zone" id="drop-zone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">📁</div>
+                        <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 5px;">Drag & Drop Images Here</div>
+                        <div style="color: var(--text-light);">or click the upload button above</div>
+                    </div>
+
+                    <div id="items-grid" class="items-grid"></div>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn btn-success" onclick="saveTemplate()">
+                        💾 Save Template
+                    </button>
+                    <button class="btn btn-secondary" onclick="showScreen('home')">
+                        ❌ Cancel
+                    </button>
+                </div>
+            </div>
+
+            <!-- My Templates Screen -->
+            <div id="my-templates-screen" class="screen">
+                <h2 class="section-title">My Templates</h2>
+                <div id="templates-list"></div>
+            </div>
+
+            <!-- Evaluate Screen -->
+            <div id="evaluate-screen" class="screen">
+                <h2 class="section-title">Evaluate Items</h2>
+                <div id="evaluation-name-section">
+                    <div class="form-group">
+                        <label class="form-label">Evaluation Name</label>
+                        <input type="text" id="evaluation-name" class="form-input" placeholder="e.g., My Movie Rankings 2025">
+                    </div>
+                </div>
+                <div id="tier-list-container" class="tier-list-container"></div>
+                <div class="unranked-zone">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 15px;">Unranked Items</h3>
+                    <div id="unranked-items" class="unranked-items"></div>
+                </div>
+                <div class="action-bar">
+                    <button class="btn btn-success" onclick="saveEvaluation()">
+                        💾 Save Evaluation
+                    </button>
+                    <button class="btn btn-primary" onclick="downloadEvaluationImage()">
+                        📥 Download as Image
+                    </button>
+                    <button class="btn btn-secondary" onclick="showScreen('home')">
+                        ❌ Cancel
+                    </button>
+                </div>
+            </div>
+
+            <!-- My Evaluations Screen -->
+            <div id="my-evaluations-screen" class="screen">
+                <h2 class="section-title">My Evaluations</h2>
+                <div id="evaluations-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="tier-system-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-header">Choose Tier System</h2>
+            <div class="modal-option" onclick="selectTierSystem('standard')">
+                <h4>Standard</h4>
+                <p>S, A, B, C, D, F - The classic tier ranking system</p>
+            </div>
+            <div class="modal-option" onclick="selectTierSystem('extended')">
+                <h4>Extended</h4>
+                <p>T, S, A, B, C, D, F - Includes Transcendental tier</p>
+            </div>
+            <div class="modal-option" onclick="selectTierSystem('custom')">
+                <h4>Custom</h4>
+                <p>Create your own custom tier labels</p>
+            </div>
+            <button class="btn btn-secondary" onclick="closeModal('tier-system-modal')" style="margin-top: 20px; width: 100%;">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <div id="text-item-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-header">Add Text Item</h2>
+            <div class="form-group">
+                <label class="form-label">Item Text</label>
+                <input type="text" id="text-item-input" class="form-input" placeholder="e.g., The Shawshank Redemption">
+            </div>
+            <button class="btn btn-primary" onclick="addTextItem()" style="width: 100%;">
+                ➕ Add Item
+            </button>
+            <button class="btn btn-secondary" onclick="closeModal('text-item-modal')" style="margin-top: 10px; width: 100%;">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <div id="template-select-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-header">Select Template to Evaluate</h2>
+            <div id="template-select-list"></div>
+            <button class="btn btn-secondary" onclick="closeModal('template-select-modal')" style="margin-top: 20px; width: 100%;">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Data Management
+        const DATA_KEY = 'tierListMakerData';
+        let currentTemplate = null;
+        let currentEvaluation = null;
+        let draggedElement = null;
+
+        function loadData() {
+            const data = localStorage.getItem(DATA_KEY);
+            return data ? JSON.parse(data) : { templates: [], evaluations: [] };
+        }
+
+        function saveData(data) {
+            localStorage.setItem(DATA_KEY, JSON.stringify(data));
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Screen Management
+        function showScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(`${screenName}-screen`).classList.add('active');
+
+            if (screenName === 'my-templates') {
+                renderTemplates();
+            } else if (screenName === 'my-evaluations') {
+                renderEvaluations();
+            } else if (screenName === 'create-template') {
+                resetTemplateForm();
+            }
+        }
+
+        // Modal Management
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Template Creation
+        function handleTierSystemChange() {
+            const system = document.getElementById('tier-system').value;
+            const customContainer = document.getElementById('custom-tiers-container');
+            const tierEditor = document.getElementById('tier-editor');
+            const itemsSection = document.getElementById('items-section');
+
+            if (system === 'custom') {
+                customContainer.style.display = 'block';
+                tierEditor.style.display = 'none';
+                itemsSection.style.display = 'none';
+                generateCustomTierInputs();
+            } else if (system) {
+                customContainer.style.display = 'none';
+                initializeTiers(system);
+                tierEditor.style.display = 'block';
+                itemsSection.style.display = 'block';
+            } else {
+                customContainer.style.display = 'none';
+                tierEditor.style.display = 'none';
+                itemsSection.style.display = 'none';
+            }
+        }
+
+        function generateCustomTierInputs() {
+            const count = parseInt(document.getElementById('custom-tier-count').value) || 5;
+            const container = document.getElementById('custom-tiers-input');
+            container.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                const div = document.createElement('div');
+                div.className = 'custom-tier-input';
+                div.innerHTML = `
+                    <input type="text" class="form-input" placeholder="Tier ${i + 1} label" id="custom-tier-label-${i}">
+                    <input type="color" class="tier-color-picker" value="${getRandomColor()}" id="custom-tier-color-${i}">
+                `;
+                container.appendChild(div);
+            }
+
+            const btnContainer = document.createElement('div');
+            btnContainer.style.marginTop = '20px';
+            btnContainer.innerHTML = '<button class="btn btn-primary" onclick="applyCustomTiers()">Apply Custom Tiers</button>';
+            container.appendChild(btnContainer);
+        }
+
+        function applyCustomTiers() {
+            const count = parseInt(document.getElementById('custom-tier-count').value) || 5;
+            const tiers = [];
+
+            for (let i = 0; i < count; i++) {
+                const label = document.getElementById(`custom-tier-label-${i}`).value.trim();
+                const color = document.getElementById(`custom-tier-color-${i}`).value;
+
+                if (!label) {
+                    alert(`Please enter a label for Tier ${i + 1}`);
+                    return;
+                }
+
+                tiers.push({
+                    id: generateId(),
+                    label: label,
+                    color: color
+                });
+            }
+
+            currentTemplate = { tiers, items: [] };
+            renderTiers();
+            document.getElementById('tier-editor').style.display = 'block';
+            document.getElementById('items-section').style.display = 'block';
+            document.getElementById('custom-tiers-container').style.display = 'none';
+        }
+
+        function initializeTiers(system) {
+            let tiers = [];
+
+            if (system === 'standard') {
+                tiers = [
+                    { id: generateId(), label: 'S', color: '#ff7f7f' },
+                    { id: generateId(), label: 'A', color: '#ffbf7f' },
+                    { id: generateId(), label: 'B', color: '#ffdf7f' },
+                    { id: generateId(), label: 'C', color: '#ffff7f' },
+                    { id: generateId(), label: 'D', color: '#bfff7f' },
+                    { id: generateId(), label: 'F', color: '#7fbfff' }
+                ];
+            } else if (system === 'extended') {
+                tiers = [
+                    { id: generateId(), label: 'T', color: '#ff4757' },
+                    { id: generateId(), label: 'S', color: '#ff7f7f' },
+                    { id: generateId(), label: 'A', color: '#ffbf7f' },
+                    { id: generateId(), label: 'B', color: '#ffdf7f' },
+                    { id: generateId(), label: 'C', color: '#ffff7f' },
+                    { id: generateId(), label: 'D', color: '#bfff7f' },
+                    { id: generateId(), label: 'F', color: '#7fbfff' }
+                ];
+            }
+
+            currentTemplate = { tiers, items: [] };
+            renderTiers();
+        }
+
+        function renderTiers() {
+            const container = document.getElementById('tiers-list');
+            container.innerHTML = '';
+
+            currentTemplate.tiers.forEach((tier, index) => {
+                const div = document.createElement('div');
+                div.className = 'tier-item';
+                div.innerHTML = `
+                    <input type="color" class="tier-color-picker" value="${tier.color}" 
+                           onchange="updateTierColor('${tier.id}', this.value)">
+                    <input type="text" class="tier-label-input" value="${tier.label}" 
+                           onchange="updateTierLabel('${tier.id}', this.value)">
+                    <div class="tier-controls">
+                        ${index > 0 ? `<button class="icon-btn" style="background: var(--light);" onclick="moveTier('${tier.id}', -1)">↑</button>` : ''}
+                        ${index < currentTemplate.tiers.length - 1 ? `<button class="icon-btn" style="background: var(--light);" onclick="moveTier('${tier.id}', 1)">↓</button>` : ''}
+                        <button class="icon-btn" style="background: var(--danger); color: white;" onclick="deleteTier('${tier.id}')">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateTierColor(tierId, color) {
+            const tier = currentTemplate.tiers.find(t => t.id === tierId);
+            if (tier) tier.color = color;
+        }
+
+        function updateTierLabel(tierId, label) {
+            const tier = currentTemplate.tiers.find(t => t.id === tierId);
+            if (tier) tier.label = label;
+        }
+
+        function moveTier(tierId, direction) {
+            const index = currentTemplate.tiers.findIndex(t => t.id === tierId);
+            if (index === -1) return;
+
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= currentTemplate.tiers.length) return;
+
+            [currentTemplate.tiers[index], currentTemplate.tiers[newIndex]] = 
+            [currentTemplate.tiers[newIndex], currentTemplate.tiers[index]];
+
+            renderTiers();
+        }
+
+        function deleteTier(tierId) {
+            if (currentTemplate.tiers.length <= 1) {
+                alert('You must have at least one tier!');
+                return;
+            }
+
+            currentTemplate.tiers = currentTemplate.tiers.filter(t => t.id !== tierId);
+            renderTiers();
+        }
+
+        function addTier() {
+            const newTier = {
+                id: generateId(),
+                label: String.fromCharCode(65 + currentTemplate.tiers.length),
+                color: getRandomColor()
+            };
+            currentTemplate.tiers.push(newTier);
+            renderTiers();
+        }
+
+        function getRandomColor() {
+            const colors = ['#ff7f7f', '#ffbf7f', '#ffdf7f', '#ffff7f', '#bfff7f', '#7fff7f', '#7fffbf', '#7fbfff', '#bf7fff', '#ff7fbf'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Item Management
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            processImageFiles(files);
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('drop-zone').classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            processImageFiles(files);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('drop-zone').classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('drop-zone').classList.remove('dragover');
+        }
+
+        function processImageFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const item = {
+                            id: generateId(),
+                            type: 'image',
+                            content: e.target.result
+                        };
+                        currentTemplate.items.push(item);
+                        renderItems();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function showAddTextModal() {
+            document.getElementById('text-item-input').value = '';
+            openModal('text-item-modal');
+        }
+
+        function addTextItem() {
+            const text = document.getElementById('text-item-input').value.trim();
+            if (!text) {
+                alert('Please enter some text!');
+                return;
+            }
+
+            const item = {
+                id: generateId(),
+                type: 'text',
+                content: text
+            };
+            currentTemplate.items.push(item);
+            renderItems();
+            closeModal('text-item-modal');
+        }
+
+        function renderItems() {
+            const container = document.getElementById('items-grid');
+            container.innerHTML = '';
+
+            currentTemplate.items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `item-card ${item.type}`;
+                div.draggable = true;
+
+                if (item.type === 'image') {
+                    div.innerHTML = `
+                        <img src="${item.content}" alt="Item">
+                        <button class="delete-item" onclick="deleteItem('${item.id}')">×</button>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        ${item.content}
+                        <button class="delete-item" onclick="deleteItem('${item.id}')">×</button>
+                    `;
+                }
+
+                container.appendChild(div);
+            });
+        }
+
+        function deleteItem(itemId) {
+            currentTemplate.items = currentTemplate.items.filter(i => i.id !== itemId);
+            renderItems();
+        }
+
+        // Save Template
+        function saveTemplate() {
+            const name = document.getElementById('template-name').value.trim();
+            if (!name) {
+                alert('Please enter a template name!');
+                return;
+            }
+
+            if (!currentTemplate || currentTemplate.tiers.length === 0) {
+                alert('Please create at least one tier!');
+                return;
+            }
+
+            if (currentTemplate.items.length === 0) {
+                alert('Please add at least one item to rank!');
+                return;
+            }
+
+            const data = loadData();
+            const template = {
+                id: generateId(),
+                name: name,
+                tiers: currentTemplate.tiers,
+                items: currentTemplate.items,
+                createdAt: Date.now()
+            };
+
+            data.templates.push(template);
+            saveData(data);
+
+            alert('Template saved successfully!');
+            showScreen('my-templates');
+        }
+
+        function resetTemplateForm() {
+            document.getElementById('template-name').value = '';
+            document.getElementById('tier-system').value = '';
+            document.getElementById('custom-tiers-container').style.display = 'none';
+            document.getElementById('tier-editor').style.display = 'none';
+            document.getElementById('items-section').style.display = 'none';
+            document.getElementById('items-grid').innerHTML = '';
+            currentTemplate = null;
+        }
+
+        // Render Templates
+        function renderTemplates() {
+            const data = loadData();
+            const container = document.getElementById('templates-list');
+
+            if (data.templates.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div class="empty-state-text">No templates yet</div>
+                        <button class="btn btn-primary" onclick="showScreen('create-template')" style="margin-top: 20px;">
+                            Create Your First Template
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            data.templates.forEach(template => {
+                const div = document.createElement('div');
+                div.className = 'template-card';
+                div.innerHTML = `
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${template.name}</div>
+                            <div style="margin-top: 8px;">
+                                <span class="badge">${template.tiers.length} tiers</span>
+                                <span class="badge">${template.items.length} items</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" onclick="startEvaluationWithTemplate('${template.id}')">
+                                ⭐ Evaluate
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteTemplate('${template.id}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        ${template.tiers.map(tier => `
+                            <div style="padding: 8px 16px; border-radius: 8px; background: ${tier.color}; color: white; font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                                ${tier.label}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function deleteTemplate(templateId) {
+            if (!confirm('Are you sure you want to delete this template?')) return;
+
+            const data = loadData();
+            data.templates = data.templates.filter(t => t.id !== templateId);
+            data.evaluations = data.evaluations.filter(e => e.templateId !== templateId);
+            saveData(data);
+            renderTemplates();
+        }
+
+        // Evaluation
+        function initEvaluate() {
+            const data = loadData();
+            if (data.templates.length === 0) {
+                alert('You need to create a template first!');
+                showScreen('create-template');
+                return;
+            }
+
+            const container = document.getElementById('template-select-list');
+            container.innerHTML = '';
+
+            data.templates.forEach(template => {
+                const div = document.createElement('div');
+                div.className = 'modal-option';
+                div.onclick = () => {
+                    closeModal('template-select-modal');
+                    startEvaluationWithTemplate(template.id);
+                };
+                div.innerHTML = `
+                    <h4>${template.name}</h4>
+                    <p>${template.tiers.length} tiers • ${template.items.length} items</p>
+                `;
+                container.appendChild(div);
+            });
+
+            openModal('template-select-modal');
+        }
+
+        function startEvaluationWithTemplate(templateId) {
+            const data = loadData();
+            const template = data.templates.find(t => t.id === templateId);
+            if (!template) return;
+
+            currentEvaluation = {
+                templateId: templateId,
+                template: template,
+                placements: {}
+            };
+
+            // Initialize empty placements for each tier
+            template.tiers.forEach(tier => {
+                currentEvaluation.placements[tier.id] = [];
+            });
+
+            // Initialize unranked items
+            currentEvaluation.placements['unranked'] = template.items.map(item => item.id);
+
+            renderEvaluationInterface();
+            showScreen('evaluate');
+        }
+
+        function renderEvaluationInterface() {
+            const container = document.getElementById('tier-list-container');
+            container.innerHTML = '';
+
+            currentEvaluation.template.tiers.forEach(tier => {
+                const div = document.createElement('div');
+                div.className = 'tier-row';
+                div.innerHTML = `
+                    <div class="tier-label-display" style="background: ${tier.color};">
+                        ${tier.label}
+                    </div>
+                    <div class="tier-drop-zone" data-tier-id="${tier.id}" 
+                         ondrop="handleEvaluationDrop(event)" 
+                         ondragover="handleEvaluationDragOver(event)"
+                         ondragleave="handleEvaluationDragLeave(event)">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            renderEvaluationItems();
+        }
+
+        function renderEvaluationItems() {
+            // Render items in tiers
+            currentEvaluation.template.tiers.forEach(tier => {
+                const zone = document.querySelector(`[data-tier-id="${tier.id}"]`);
+                zone.innerHTML = '';
+
+                const itemIds = currentEvaluation.placements[tier.id] || [];
+                itemIds.forEach(itemId => {
+                    const item = currentEvaluation.template.items.find(i => i.id === itemId);
+                    if (item) {
+                        zone.appendChild(createEvaluationItem(item));
+                    }
+                });
+            });
+
+            // Render unranked items
+            const unrankedZone = document.getElementById('unranked-items');
+            unrankedZone.innerHTML = '';
+
+            const unrankedIds = currentEvaluation.placements['unranked'] || [];
+            unrankedIds.forEach(itemId => {
+                const item = currentEvaluation.template.items.find(i => i.id === itemId);
+                if (item) {
+                    unrankedZone.appendChild(createEvaluationItem(item));
+                }
+            });
+        }
+
+        function createEvaluationItem(item) {
+            const div = document.createElement('div');
+            div.className = `evaluation-item ${item.type}`;
+            div.draggable = true;
+            div.dataset.itemId = item.id;
+
+            div.ondragstart = (e) => {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', div.innerHTML);
+                draggedElement = div;
+                setTimeout(() => div.classList.add('dragging'), 0);
+            };
+
+            div.ondragend = () => {
+                div.classList.remove('dragging');
+                draggedElement = null;
+            };
+
+            if (item.type === 'image') {
+                div.innerHTML = `<img src="${item.content}" alt="Item">`;
+            } else {
+                div.textContent = item.content;
+            }
+
+            return div;
+        }
+
+        function handleEvaluationDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function handleEvaluationDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleEvaluationDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+
+            if (!draggedElement) return;
+
+            const itemId = draggedElement.dataset.itemId;
+            const targetTierId = event.currentTarget.dataset.tierId || 'unranked';
+
+            // Remove item from all placements
+            Object.keys(currentEvaluation.placements).forEach(key => {
+                currentEvaluation.placements[key] = currentEvaluation.placements[key].filter(id => id !== itemId);
+            });
+
+            // Add to new placement
+            if (!currentEvaluation.placements[targetTierId]) {
+                currentEvaluation.placements[targetTierId] = [];
+            }
+            currentEvaluation.placements[targetTierId].push(itemId);
+
+            renderEvaluationItems();
+        }
+
+        // Add drag and drop for unranked zone
+        document.addEventListener('DOMContentLoaded', () => {
+            const unrankedZone = document.getElementById('unranked-items');
+            if (unrankedZone) {
+                unrankedZone.ondrop = handleEvaluationDrop;
+                unrankedZone.ondragover = handleEvaluationDragOver;
+                unrankedZone.ondragleave = handleEvaluationDragLeave;
+                unrankedZone.dataset.tierId = 'unranked';
+            }
+        });
+
+        function saveEvaluation() {
+            const name = document.getElementById('evaluation-name').value.trim();
+            if (!name) {
+                alert('Please enter an evaluation name!');
+                return;
+            }
+
+            const data = loadData();
+            const evaluation = {
+                id: generateId(),
+                name: name,
+                templateId: currentEvaluation.templateId,
+                template: currentEvaluation.template,
+                placements: currentEvaluation.placements,
+                createdAt: Date.now()
+            };
+
+            data.evaluations.push(evaluation);
+            saveData(data);
+
+            alert('Evaluation saved successfully!');
+            showScreen('my-evaluations');
+        }
+
+        function downloadEvaluationImage() {
+            const name = document.getElementById('evaluation-name').value.trim() || 'tier-list';
+            const container = document.getElementById('tier-list-container');
+
+            html2canvas(container, {
+                backgroundColor: '#ffffff',
+                scale: 2
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${name.replace(/\s+/g, '-').toLowerCase()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        // Render Evaluations
+        function renderEvaluations() {
+            const data = loadData();
+            const container = document.getElementById('evaluations-list');
+
+            if (data.evaluations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <div class="empty-state-text">No evaluations yet</div>
+                        <button class="btn btn-primary" onclick="initEvaluate()" style="margin-top: 20px;">
+                            Create Your First Evaluation
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            data.evaluations.forEach(evaluation => {
+                const div = document.createElement('div');
+                div.className = 'evaluation-card';
+                
+                const date = new Date(evaluation.createdAt).toLocaleDateString();
+                
+                div.innerHTML = `
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${evaluation.name}</div>
+                            <div style="margin-top: 8px; color: var(--text-light);">
+                                Template: ${evaluation.template.name} • ${date}
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" onclick="editEvaluation('${evaluation.id}')">
+                                ✏️ Edit
+                            </button>
+                            <button class="btn btn-success" onclick="downloadEvaluationById('${evaluation.id}')">
+                                📥 Download
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteEvaluation('${evaluation.id}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        ${renderEvaluationPreview(evaluation)}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderEvaluationPreview(evaluation) {
+            let html = '';
+            evaluation.template.tiers.forEach(tier => {
+                const itemIds = evaluation.placements[tier.id] || [];
+                html += `
+                    <div style="display: flex; min-height: 60px; margin-bottom: 2px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px var(--shadow);">
+                        <div style="min-width: 60px; background: ${tier.color}; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; font-size: 1.5rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                            ${tier.label}
+                        </div>
+                        <div style="flex: 1; padding: 10px; display: flex; gap: 8px; flex-wrap: wrap; background: rgba(0,0,0,0.02);">
+                            ${itemIds.map(itemId => {
+                                const item = evaluation.template.items.find(i => i.id === itemId);
+                                if (!item) return '';
+                                if (item.type === 'image') {
+                                    return `<div style="width: 50px; height: 50px; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px var(--shadow);">
+                                        <img src="${item.content}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>`;
+                                } else {
+                                    return `<div style="padding: 8px 12px; background: white; border-radius: 6px; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 4px var(--shadow);">
+                                        ${item.content}
+                                    </div>`;
+                                }
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            return html;
+        }
+
+        function editEvaluation(evaluationId) {
+            const data = loadData();
+            const evaluation = data.evaluations.find(e => e.id === evaluationId);
+            if (!evaluation) return;
+
+            currentEvaluation = {
+                id: evaluation.id,
+                templateId: evaluation.templateId,
+                template: evaluation.template,
+                placements: evaluation.placements
+            };
+
+            document.getElementById('evaluation-name').value = evaluation.name;
+            renderEvaluationInterface();
+            showScreen('evaluate');
+
+            // Update save button to handle editing
+            const saveBtn = document.querySelector('#evaluate-screen .btn-success');
+            saveBtn.onclick = () => updateEvaluation(evaluationId);
+        }
+
+        function updateEvaluation(evaluationId) {
+            const name = document.getElementById('evaluation-name').value.trim();
+            if (!name) {
+                alert('Please enter an evaluation name!');
+                return;
+            }
+
+            const data = loadData();
+            const index = data.evaluations.findIndex(e => e.id === evaluationId);
+            if (index === -1) return;
+
+            data.evaluations[index] = {
+                ...data.evaluations[index],
+                name: name,
+                placements: currentEvaluation.placements,
+                updatedAt: Date.now()
+            };
+
+            saveData(data);
+            alert('Evaluation updated successfully!');
+            
+            // Reset save button
+            const saveBtn = document.querySelector('#evaluate-screen .btn-success');
+            saveBtn.onclick = saveEvaluation;
+            
+            showScreen('my-evaluations');
+        }
+
+        function downloadEvaluationById(evaluationId) {
+            const data = loadData();
+            const evaluation = data.evaluations.find(e => e.id === evaluationId);
+            if (!evaluation) return;
+
+            // Create a temporary container
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.background = 'white';
+            tempContainer.style.padding = '40px';
+            document.body.appendChild(tempContainer);
+
+            // Render evaluation
+            evaluation.template.tiers.forEach(tier => {
+                const itemIds = evaluation.placements[tier.id] || [];
+                const row = document.createElement('div');
+                row.style.cssText = 'display: flex; min-height: 100px; margin-bottom: 2px; border-radius: 8px; overflow: hidden;';
+                
+                row.innerHTML = `
+                    <div style="min-width: 100px; background: ${tier.color}; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; font-size: 2rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                        ${tier.label}
+                    </div>
+                    <div style="flex: 1; padding: 15px; display: flex; gap: 10px; flex-wrap: wrap; background: rgba(0,0,0,0.03);">
+                        ${itemIds.map(itemId => {
+                            const item = evaluation.template.items.find(i => i.id === itemId);
+                            if (!item) return '';
+                            if (item.type === 'image') {
+                                return `<div style="width: 80px; height: 80px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                    <img src="${item.content}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>`;
+                            } else {
+                                return `<div style="padding: 10px 15px; background: white; border-radius: 8px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                    ${item.content}
+                                </div>`;
+                            }
+                        }).join('')}
+                    </div>
+                `;
+                tempContainer.appendChild(row);
+            });
+
+            // Generate image
+            html2canvas(tempContainer, {
+                backgroundColor: '#ffffff',
+                scale: 2
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${evaluation.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                document.body.removeChild(tempContainer);
+            });
+        }
+
+        function deleteEvaluation(evaluationId) {
+            if (!confirm('Are you sure you want to delete this evaluation?')) return;
+
+            const data = loadData();
+            data.evaluations = data.evaluations.filter(e => e.id !== evaluationId);
+            saveData(data);
+            renderEvaluations();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            showScreen('home');
+        });
+    </script>
+</body>
+</html>
